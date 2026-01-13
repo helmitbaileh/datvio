@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <title>Datvio | العمل</title>
+    <title>Datvio | سجل العمل</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap"
@@ -12,18 +12,11 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
       rel="stylesheet"
     />
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <style>
       body {
         font-family: "Tajawal", sans-serif;
-        background-color: #f3f4f6;
-      }
-      .input-box {
-        width: 100%;
-        border: 1px solid #e5e7eb;
-        padding: 8px;
-        border-radius: 8px;
-        font-size: 0.9rem;
+        background-color: #f8fafc;
+        color: #0f172a;
       }
     </style>
   </head>
@@ -32,133 +25,112 @@
       class="bg-white border-b border-gray-200 px-6 h-16 flex justify-between items-center sticky top-0 z-40"
     >
       <div class="flex items-center gap-6">
-        <div class="font-black text-2xl text-gray-900">DATVIO</div>
-        <div class="flex bg-gray-100 p-1 rounded-lg gap-1">
+        <div class="font-black text-2xl text-slate-900 tracking-tighter">
+          DATVIO
+        </div>
+        <div class="flex bg-slate-100 p-1 rounded-lg gap-1">
           <a
             href="equity.html"
-            class="px-4 py-1.5 text-gray-500 font-bold text-sm hover:bg-gray-200 rounded-md"
+            class="px-4 py-1.5 text-slate-500 font-bold text-sm hover:bg-gray-200 rounded transition"
             >الحصص</a
           >
           <a
             href="work.html"
-            class="px-4 py-1.5 bg-white text-blue-600 font-bold text-sm rounded-md shadow-sm"
+            class="px-4 py-1.5 bg-white text-blue-700 font-bold text-sm rounded shadow-sm"
             >سجل العمل</a
           >
         </div>
       </div>
       <button
         id="logout"
-        class="text-xs font-bold text-red-500 hover:bg-red-50 px-3 py-1.5 rounded"
+        class="text-xs font-bold text-red-500 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg transition"
       >
         خروج
       </button>
     </nav>
 
-    <div class="p-8 max-w-[1200px] mx-auto w-full flex-1">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white p-5 rounded-xl border shadow-sm md:col-span-2">
-          <h3 class="font-bold text-sm mb-3">تسجيل عمل جديد</h3>
-          <div class="grid grid-cols-4 gap-3">
-            <div class="col-span-3">
-              <input
-                id="logDesc"
-                type="text"
-                class="input-box"
-                placeholder="ماذا أنجزت؟"
-              />
-            </div>
-            <div>
-              <input
-                id="logHours"
-                type="number"
-                class="input-box"
-                placeholder="ساعات"
-              />
-            </div>
-            <div class="col-span-2">
-              <select id="logProject" class="input-box">
-                <option value="">مشروع عام</option>
-              </select>
-            </div>
-            <div class="col-span-1">
-              <input id="logDate" type="date" class="input-box" />
-            </div>
-            <button
-              onclick="addLog()"
-              class="bg-black text-white rounded-lg font-bold text-sm"
-            >
-              حفظ
-            </button>
-          </div>
-        </div>
-
-        <div class="bg-white p-5 rounded-xl border shadow-sm">
-          <h3 class="font-bold text-sm mb-3">المشاريع</h3>
-          <div class="flex gap-2 mb-3">
-            <input
-              id="newProj"
-              type="text"
-              class="input-box text-xs"
-              placeholder="اسم المشروع"
-            />
-            <button
-              onclick="addProj()"
-              class="bg-gray-200 px-3 rounded font-bold"
-            >
-              +
-            </button>
-          </div>
-          <div
-            id="projList"
-            class="space-y-1 max-h-32 overflow-y-auto text-xs"
-          ></div>
-        </div>
-      </div>
-
-      <div class="bg-white rounded-xl border shadow-sm overflow-hidden mb-10">
-        <div class="p-4 border-b flex justify-between items-center">
-          <h3 class="font-bold text-sm">أحدث السجلات</h3>
-          <button
-            onclick="exportLogs()"
-            class="text-[10px] font-bold text-green-700 bg-green-50 px-3 py-1 rounded"
-          >
-            تصدير Excel
-          </button>
-        </div>
-        <table class="w-full text-sm">
-          <thead class="bg-gray-50 text-gray-500 text-xs border-b">
-            <tr class="text-right">
-              <th class="px-4 py-3">الشريك</th>
-              <th class="px-4">المشروع</th>
-              <th class="px-4">الوصف</th>
-              <th class="px-4">التاريخ</th>
-              <th class="px-4">المدة</th>
-              <th class="px-4"></th>
-            </tr>
-          </thead>
-          <tbody id="logsBody" class="divide-y"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="bg-gray-100 border-t border-gray-200 py-6 mt-auto">
-      <div class="max-w-[1200px] mx-auto px-8">
-        <div
-          class="flex justify-between items-center opacity-60 hover:opacity-100 transition duration-300"
+    <div class="p-6 md:p-10 max-w-5xl mx-auto w-full">
+      <div
+        class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8"
+      >
+        <h2
+          class="text-xl font-black text-slate-800 mb-4 flex items-center gap-2"
         >
-          <div class="text-xs text-gray-400 font-bold"></div>
-          <button
-            onclick="generateAI()"
-            id="aiBtn"
-            class="bg-white border border-gray-300 text-indigo-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-50 flex items-center gap-2"
-          >
-            <i class="fa-solid fa-wand-magic-sparkles"></i> تلخيص الإنجازات (AI)
-          </button>
+          <i class="fa-solid fa-pen-to-square text-blue-500"></i> تسجيل إنجاز
+          جديد
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+          <div class="md:col-span-1">
+            <label class="block text-xs font-bold text-slate-500 mb-1"
+              >المشروع / المهمة</label
+            >
+            <input
+              type="text"
+              id="taskName"
+              class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold focus:border-blue-500 outline-none"
+              placeholder="مثلاً: تطوير الواجهة"
+            />
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold text-slate-500 mb-1"
+              >تفاصيل الإنجاز</label
+            >
+            <input
+              type="text"
+              id="taskDesc"
+              class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold focus:border-blue-500 outline-none"
+              placeholder="ماذا أنجزت بالتحديد؟"
+            />
+          </div>
+          <div class="md:col-span-1">
+            <label class="block text-xs font-bold text-slate-500 mb-1"
+              >عدد الساعات</label
+            >
+            <div class="flex gap-2">
+              <input
+                type="number"
+                id="taskHours"
+                class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold focus:border-blue-500 outline-none text-center"
+                placeholder="0"
+              />
+              <button
+                id="saveBtn"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold text-sm transition shadow-lg shadow-blue-200"
+              >
+                حفظ
+              </button>
+            </div>
+          </div>
         </div>
         <div
-          id="aiResult"
-          class="hidden mt-4 bg-white p-6 rounded-xl border border-indigo-100 shadow-sm text-sm leading-relaxed whitespace-pre-line text-gray-700"
+          id="msgBox"
+          class="hidden mt-3 text-xs font-bold text-center p-2 rounded"
         ></div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <h2
+          class="text-xl font-black text-slate-800 mb-4 flex items-center gap-2"
+        >
+          <i class="fa-solid fa-list-check text-green-500"></i> سجل الفريق
+        </h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-right">
+            <thead>
+              <tr class="text-xs text-slate-400 border-b border-slate-100">
+                <th class="pb-3 pr-2">الشريك</th>
+                <th class="pb-3">المشروع</th>
+                <th class="pb-3">التفاصيل</th>
+                <th class="pb-3 text-center">الساعات</th>
+                <th class="pb-3 text-left pl-2">التاريخ</th>
+              </tr>
+            </thead>
+            <tbody
+              id="logsTable"
+              class="text-sm font-bold text-slate-700"
+            ></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -168,19 +140,18 @@
         getFirestore,
         collection,
         addDoc,
-        deleteDoc,
-        doc,
-        onSnapshot,
         query,
         orderBy,
+        onSnapshot,
+        serverTimestamp,
+        doc,
+        getDoc,
       } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
       import {
         getAuth,
-        signOut,
         onAuthStateChanged,
+        signOut,
       } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-
-      const GEMINI_API_KEY = "";
 
       const firebaseConfig = {
         apiKey: "AIzaSyCi4vc7l79E1vh2w1bPLX__yvqSxcwTFrg",
@@ -190,169 +161,132 @@
         messagingSenderId: "456507473964",
         appId: "1:456507473964:web:efac6eceafaf5bd3e3d189",
       };
+
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
       const auth = getAuth(app);
 
-      let logs = [],
-        projects = [];
-      let userRole = "viewer";
+      let currentUser = null;
+      let userName = "شريك";
 
-      onAuthStateChanged(auth, (user) => {
-        if (!user) window.location.href = "index.html";
-        init();
+      // التحقق من الدخول
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) return (window.location.href = "index.html");
+        currentUser = user;
+
+        // جلب اسم المستخدم من ملفه الشخصي
+        const docSnap = await getDoc(doc(db, "partners_v6", user.uid));
+        if (docSnap.exists()) {
+          userName = docSnap.data().name;
+        } else if (user.displayName) {
+          userName = user.displayName;
+        }
+
+        loadLogs();
       });
+
       document.getElementById("logout").onclick = () => signOut(auth);
 
-      function init() {
-        onSnapshot(
-          query(collection(db, "projects_v6"), orderBy("created", "desc")),
-          (s) => {
-            projects = [];
-            let h = '<option value="">عام</option>';
-            s.forEach((d) => {
-              const data = d.data();
-              projects.push({ id: d.id, ...data });
-              h += `<option value="${d.id}">${data.name}</option>`;
-            });
-            document.getElementById("logProject").innerHTML = h;
-            document.getElementById("projList").innerHTML = projects
-              .map(
-                (p) =>
-                  `<div class="flex justify-between bg-gray-50 p-1 mb-1 rounded"><span>${p.name}</span><button onclick="delProj('${p.id}')" class="text-red-400">×</button></div>`
-              )
-              .join("");
-          }
-        );
+      // زر الحفظ
+      document.getElementById("saveBtn").onclick = async () => {
+        const task = document.getElementById("taskName").value;
+        const desc = document.getElementById("taskDesc").value;
+        const hours = document.getElementById("taskHours").value;
+        const btn = document.getElementById("saveBtn");
+        const msg = document.getElementById("msgBox");
 
-        onSnapshot(
-          query(collection(db, "work_logs_v6"), orderBy("date", "desc")),
-          (s) => {
-            logs = [];
-            s.forEach((d) => logs.push({ id: d.id, ...d.data() }));
-            document.getElementById("logsBody").innerHTML = logs
-              .map(
-                (l) => `
-                    <tr class="hover:bg-gray-50"><td class="px-4 py-3 font-bold">${
-                      l.partnerName
-                    }</td><td class="px-4 text-xs text-gray-500">${
-                  l.projectName || "-"
-                }</td><td class="px-4 text-gray-600">${
-                  l.description
-                }</td><td class="px-4 text-xs dir-ltr text-gray-400">${
-                  l.date
-                }</td><td class="px-4 font-bold text-blue-600 dir-ltr">${
-                  l.hours
-                }h</td><td class="px-4 text-center"><button onclick="delLog('${
-                  l.id
-                }','${
-                  l.partnerId
-                }')" class="text-gray-300 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td></tr>
-                `
-              )
-              .join("");
-          }
-        );
-      }
-
-      window.addLog = async () => {
-        const desc = document.getElementById("logDesc").value;
-        const hours = document.getElementById("logHours").value;
-        const projSelect = document.getElementById("logProject");
-        if (!desc || !hours) return alert("أكمل البيانات");
-
-        await addDoc(collection(db, "work_logs_v6"), {
-          partnerId: auth.currentUser.uid,
-          partnerName: auth.currentUser.displayName,
-          description: desc,
-          hours: Number(hours),
-          date:
-            document.getElementById("logDate").value ||
-            new Date().toISOString().split("T")[0],
-          projectId: projSelect.value,
-          projectName:
-            projSelect.options[projSelect.selectedIndex].text === "عام"
-              ? ""
-              : projSelect.options[projSelect.selectedIndex].text,
-          created: Date.now(),
-        });
-        document.getElementById("logDesc").value = "";
-        document.getElementById("logHours").value = "";
-      };
-
-      window.addProj = async () => {
-        const name = document.getElementById("newProj").value;
-        if (name) {
-          await addDoc(collection(db, "projects_v6"), {
-            name,
-            created: Date.now(),
-          });
-          document.getElementById("newProj").value = "";
+        if (!task || !desc || !hours) {
+          msg.innerText = "يرجى تعبئة جميع الحقول";
+          msg.className =
+            "mt-3 text-xs font-bold text-center p-2 rounded bg-red-50 text-red-600";
+          msg.classList.remove("hidden");
+          return;
         }
-      };
 
-      window.delProj = (id) => {
-        if (confirm("حذف؟")) deleteDoc(doc(db, "projects_v6", id));
-      };
-      window.delLog = (id, owner) => {
-        if (auth.currentUser.uid === owner || confirm("حذف سجل مستخدم آخر؟"))
-          deleteDoc(doc(db, "work_logs_v6", id));
-      };
-
-      window.exportLogs = () => {
-        const data = [["الشريك", "المشروع", "الوصف", "التاريخ", "ساعات"]];
-        logs.forEach((l) =>
-          data.push([
-            l.partnerName,
-            l.projectName,
-            l.description,
-            l.date,
-            l.hours,
-          ])
-        );
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), "Logs");
-        XLSX.writeFile(wb, "Work_Logs.xlsx");
-      };
-
-      window.generateAI = async () => {
-        if (GEMINI_API_KEY === "YOUR_GEMINI_KEY_HERE")
-          return alert("لم يتم وضع مفتاح API في الكود!");
-        const btn = document.getElementById("aiBtn");
-        btn.innerHTML = "جاري التحليل...";
         btn.disabled = true;
-
-        let txt =
-          "Work Logs:\n" +
-          logs
-            .map(
-              (l) =>
-                `- ${l.partnerName} (${l.hours}h) on ${l.projectName}: ${l.description}`
-            )
-            .join("\n");
-        const prompt = `لخص هذا العمل كتقرير إداري بالعربية: إجمالي الساعات لكل شخص، وأهم الإنجازات.\n${txt}`;
+        btn.innerText = "...";
 
         try {
-          const res = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-              }),
-            }
-          );
-          const data = await res.json();
-          document.getElementById("aiResult").innerText =
-            data.candidates[0].content.parts[0].text;
-          document.getElementById("aiResult").classList.remove("hidden");
+          // إضافة السجل للداتا بيس
+          await addDoc(collection(db, "work_logs_v6"), {
+            uid: currentUser.uid,
+            partnerName: userName,
+            project: task,
+            description: desc,
+            hours: Number(hours),
+            createdAt: serverTimestamp(), // وقت السيرفر
+          });
+
+          msg.innerText = "تم الحفظ بنجاح!";
+          msg.className =
+            "mt-3 text-xs font-bold text-center p-2 rounded bg-green-50 text-green-600";
+          msg.classList.remove("hidden");
+
+          // تنظيف الحقول
+          document.getElementById("taskName").value = "";
+          document.getElementById("taskDesc").value = "";
+          document.getElementById("taskHours").value = "";
+          setTimeout(() => msg.classList.add("hidden"), 3000);
         } catch (e) {
-          alert("خطأ في الاتصال");
+          console.error(e);
+          msg.innerText = "حدث خطأ أثناء الحفظ (تأكد من الصلاحيات)";
+          msg.className =
+            "mt-3 text-xs font-bold text-center p-2 rounded bg-red-50 text-red-600";
+          msg.classList.remove("hidden");
+        } finally {
+          btn.disabled = false;
+          btn.innerText = "حفظ";
         }
-        btn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> تلخيص الإنجازات (AI)`;
-        btn.disabled = false;
       };
+
+      // عرض السجلات (Real-time)
+      function loadLogs() {
+        const q = query(
+          collection(db, "work_logs_v6"),
+          orderBy("createdAt", "desc")
+        );
+
+        onSnapshot(q, (snapshot) => {
+          const table = document.getElementById("logsTable");
+          table.innerHTML = ""; // مسح القديم
+
+          if (snapshot.empty) {
+            table.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-slate-400">لا توجد سجلات عمل بعد</td></tr>`;
+            return;
+          }
+
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            // تحويل الوقت
+            let dateStr = "-";
+            if (data.createdAt) {
+              dateStr = data.createdAt.toDate().toLocaleDateString("ar-EG", {
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+            }
+
+            const row = `
+                    <tr class="border-b border-slate-50 hover:bg-slate-50 transition">
+                        <td class="py-4 pr-2 text-blue-600">${
+                          data.partnerName || "غير معروف"
+                        }</td>
+                        <td class="py-4">${data.project}</td>
+                        <td class="py-4 text-slate-500 font-normal">${
+                          data.description
+                        }</td>
+                        <td class="py-4 text-center"><span class="bg-slate-100 px-2 py-1 rounded text-xs font-black dir-ltr">${
+                          data.hours
+                        }h</span></td>
+                        <td class="py-4 text-left pl-2 text-xs text-slate-400 dir-ltr">${dateStr}</td>
+                    </tr>
+                  `;
+            table.innerHTML += row;
+          });
+        });
+      }
     </script>
   </body>
 </html>

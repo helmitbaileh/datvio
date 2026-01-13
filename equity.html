@@ -20,12 +20,12 @@
         color: #0f172a;
       }
 
-      /* --- تنسيق الشبكة (المصفوفة) --- */
+      /* تنسيق الشبكة */
       .matrix-table {
         border-collapse: separate;
         border-spacing: 0;
         width: 100%;
-        border: 1px solid #cbd5e1; /* حدود خارجية */
+        border: 1px solid #cbd5e1;
         border-radius: 8px;
         overflow: hidden;
         background: #fff;
@@ -38,29 +38,27 @@
         padding: 12px 8px;
         font-size: 0.75rem;
         border-bottom: 1px solid #cbd5e1;
-        border-left: 1px solid #e2e8f0; /* فواصل عمودية */
+        border-left: 1px solid #e2e8f0;
         white-space: nowrap;
       }
       .matrix-table td {
         border-bottom: 1px solid #e2e8f0;
         border-left: 1px solid #e2e8f0;
-        padding: 0; /* إزالة الحشوة لملء الخلية */
+        padding: 0;
         height: 44px;
         transition: background-color 0.1s;
       }
-      /* إزالة الحدود اليسرى لآخر عمود */
       .matrix-table th:last-child,
       .matrix-table td:last-child {
         border-left: none;
       }
 
-      /* تنسيق حقول الإدخال داخل الشبكة */
       .grid-input {
         width: 100%;
         height: 100%;
         text-align: center;
         background: transparent;
-        border: 2px solid transparent; /* حجز مكان للحدود */
+        border: 2px solid transparent;
         font-weight: 700;
         color: #334155;
         font-size: 0.9rem;
@@ -69,7 +67,7 @@
       }
       .grid-input:focus {
         background: #fff;
-        border-color: #3b82f6; /* لون أزرق عند التركيز */
+        border-color: #3b82f6;
         z-index: 10;
         position: relative;
       }
@@ -77,13 +75,12 @@
         background-color: #f8fafc;
       }
 
-      /* تنسيق خاص للأعمدة المهمة */
       .col-cash {
         background-color: #f0fdf4;
-      } /* خلفية خضراء خفيفة للمال */
+      }
       .col-total {
         background-color: #eff6ff;
-      } /* خلفية زرقاء خفيفة للنتيجة */
+      }
 
       @keyframes saveFlash {
         0% {
@@ -136,7 +133,7 @@
             مرحباً <span id="userName" class="text-blue-600">...</span>
           </h2>
           <p class="text-xs text-slate-500 font-bold">
-            نظام تثبيت الحقوق (Equity Locking) يعمل تلقائياً.
+            النظام يعمل في الوضع الآمن (تم معالجة البيانات القديمة).
           </p>
         </div>
         <div
@@ -144,7 +141,7 @@
         >
           <div class="px-4 py-2 text-center">
             <span class="block text-[10px] text-slate-400 font-bold uppercase"
-              >المدة (أشهر)</span
+              >المدة</span
             >
             <input
               id="cfgVest"
@@ -206,7 +203,6 @@
             </table>
           </div>
         </div>
-
         <div class="xl:col-span-4 space-y-4">
           <h3
             class="font-bold text-sm text-slate-700 flex items-center gap-2 px-1"
@@ -257,11 +253,16 @@
 
       onAuthStateChanged(auth, async (user) => {
         if (!user) return (window.location.href = "index.html");
-        document.getElementById("userName").innerText =
-          user.displayName.split(" ")[0];
-        const snap = await getDoc(doc(db, "partners_v6", user.uid));
-        if (snap.exists()) userRole = snap.data().role || "viewer";
-        init();
+        try {
+          document.getElementById("userName").innerText = user.displayName
+            ? user.displayName.split(" ")[0]
+            : "شريك";
+          const snap = await getDoc(doc(db, "partners_v6", user.uid));
+          if (snap.exists()) userRole = snap.data().role || "viewer";
+          init();
+        } catch (e) {
+          console.error("Auth Error:", e);
+        }
       });
 
       document.getElementById("logout").onclick = () => signOut(auth);
@@ -293,27 +294,41 @@
             render();
           }
         });
+
         onSnapshot(collection(db, "factors_v6"), (s) => {
           state.factors = [];
           s.forEach((d) => state.factors.push({ id: d.id, ...d.data() }));
           render();
         });
+
         onSnapshot(collection(db, "partners_v6"), (s) => {
           state.partners = [];
-          s.forEach((d) => state.partners.push({ id: d.id, ...d.data() }));
+          s.forEach((d) => {
+            // Defensive Check: Ensure basic fields exist
+            const data = d.data();
+            if (!data.scores) data.scores = {};
+            if (data.cash === undefined) data.cash = 0;
+            if (!data.start)
+              data.start = new Date().toISOString().split("T")[0];
+            state.partners.push({ id: d.id, ...data });
+          });
           render();
         });
       }
 
       function updateUI() {
-        document.getElementById("cfgVest").value = state.config.vesting;
-        document.getElementById("cfgCliff").value = state.config.cliff;
-        document.getElementById("cfgCash").value = state.config.cashWeight;
+        if (state.config.vesting)
+          document.getElementById("cfgVest").value = state.config.vesting;
+        if (state.config.cliff)
+          document.getElementById("cfgCliff").value = state.config.cliff;
+        if (state.config.cashWeight)
+          document.getElementById("cfgCash").value = state.config.cashWeight;
       }
 
-      // --- Precise Month Calculation ---
       function getMonthsPassed(startStr, currDate) {
+        if (!startStr) return 0; // حماية ضد التواريخ الفارغة
         let d1 = new Date(startStr);
+        if (isNaN(d1)) return 0; // حماية ضد التواريخ المعطوبة
         let d2 = new Date(currDate);
         d1.setHours(0, 0, 0, 0);
         d2.setHours(0, 0, 0, 0);
@@ -331,17 +346,17 @@
         return Math.max(0, months + days / 30.44);
       }
 
-      // --- AUTO FREEZE (SAFE) ---
       async function autoFreeze(reason) {
         if (userRole !== "admin") return;
         const batch = writeBatch(db);
         const now = new Date();
         const todayStr = now.toISOString().split("T")[0];
-        const VEST = Number(state.config.vesting);
-        const globalCLIFF = Number(state.config.cliff);
+        const VEST = Number(state.config.vesting) || 48;
+        const globalCLIFF = Number(state.config.cliff) || 12;
         let hasUpdates = false;
 
         state.partners.forEach((p) => {
+          if (!p.id || !p.start) return; // Skip bad data
           if (p.start === todayStr) return;
 
           const dynamicTotal = p._dyn || 0;
@@ -373,20 +388,17 @@
         }
       }
 
-      // --- WRAPPERS ---
       window.updFactorWeight = async (fid, val) => {
         if (userRole !== "admin") return;
         await autoFreeze("تغيير وزن معيار");
         updateDoc(doc(db, "factors_v6", fid), { weight: Number(val) });
       };
-
       window.delFactor = async (fid) => {
         if (userRole !== "admin") return;
         if (!confirm("هل أنت متأكد؟")) return;
         await autoFreeze("حذف معيار");
         deleteDoc(doc(db, "factors_v6", fid));
       };
-
       window.updScore = async (pid, fid, val) => {
         if (userRole !== "admin") return;
         await autoFreeze(`تغيير تقييم ${pid}`);
@@ -394,7 +406,6 @@
           [`scores.${fid}`]: Number(val),
         });
       };
-
       window.updPart = async (pid, key, val) => {
         if (userRole !== "admin") return;
         if (key === "cash") await autoFreeze(`تغيير كاش ${pid}`);
@@ -402,12 +413,10 @@
           [key]: key === "cash" ? Number(val) : val,
         });
       };
-
       window.updFactorName = (fid, val) => {
         if (userRole === "admin")
           updateDoc(doc(db, "factors_v6", fid), { name: val });
       };
-
       document.getElementById("addFactor").onclick = async () => {
         if (userRole === "admin")
           await setDoc(doc(collection(db, "factors_v6")), {
@@ -417,11 +426,9 @@
           });
       };
 
-      // --- RENDER GRID ---
       window.render = () => {
         const isAdmin = userRole === "admin";
 
-        // Header Row
         let h = `<th class="text-right w-48 bg-slate-50">الشريك / المنصب</th><th class="text-center w-28 col-cash">المال ($)</th>`;
         state.factors.forEach((f) => {
           h += `<th class="text-center min-w-[100px]">
@@ -450,47 +457,52 @@
         h += `<th class="text-left w-24 col-total text-blue-800">الإجمالي</th>`;
         document.getElementById("tHead").innerHTML = `<tr>${h}</tr>`;
 
-        // Data Rows
         let totCash = state.partners.reduce(
           (a, b) => a + (Number(b.cash) || 0),
           0
         );
         let totPts = 0;
         let pPts = {};
+
+        // Defensive Logic: Check if scores exist
         state.partners.forEach((p) => {
           let s = 0;
-          state.factors.forEach(
-            (f) => (s += (p.scores?.[f.id] || 0) * f.weight)
-          );
+          state.factors.forEach((f) => {
+            // Safety check for missing scores in old accounts
+            const val = p.scores && p.scores[f.id] ? p.scores[f.id] : 0;
+            s += val * f.weight;
+          });
           pPts[p.id] = s;
           totPts += s;
         });
+
         const cashWt = state.config.cashWeight || 30;
 
         let b = "";
         state.partners.forEach((p) => {
-          let cashShare = totCash ? p.cash / totCash : 0;
-          let skillShare = totPts ? pPts[p.id] / totPts : 0;
+          let cashShare = totCash ? (p.cash || 0) / totCash : 0;
+          let skillShare = totPts ? (pPts[p.id] || 0) / totPts : 0;
           p._dyn = cashShare * cashWt + skillShare * (100 - cashWt);
 
           let frozen = Number(p.frozen) || 0;
           let totalEq = frozen + p._dyn;
 
           let cells = state.factors
-            .map(
-              (f) =>
-                `<td><input type="number" min="0" max="10" value="${
-                  p.scores?.[f.id] || 0
-                }" ${!isAdmin ? "disabled" : ""} onchange="updScore('${
-                  p.id
-                }','${f.id}',this.value)" class="grid-input"></td>`
-            )
+            .map((f) => {
+              // Safety Check for input values
+              const safeVal = p.scores && p.scores[f.id] ? p.scores[f.id] : 0;
+              return `<td><input type="number" min="0" max="10" value="${safeVal}" ${
+                !isAdmin ? "disabled" : ""
+              } onchange="updScore('${p.id}','${
+                f.id
+              }',this.value)" class="grid-input"></td>`;
+            })
             .join("");
 
           b += `<tr class="hover:bg-slate-50/50">
                 <td class="pr-3 bg-white">
                     <div class="font-black text-slate-800 text-sm">${
-                      p.name
+                      p.name || "غير معروف"
                     }</div>
                     <input type="text" value="${p.jobTitle || ""}" ${
             !isAdmin ? "disabled" : ""
@@ -498,9 +510,9 @@
             p.id
           }','jobTitle',this.value)" class="w-full text-[10px] text-slate-400 bg-transparent outline-none" placeholder="المنصب">
                 </td>
-                <td class="col-cash"><input type="number" value="${p.cash}" ${
-            !isAdmin ? "disabled" : ""
-          } onchange="updPart('${
+                <td class="col-cash"><input type="number" value="${
+                  p.cash || 0
+                }" ${!isAdmin ? "disabled" : ""} onchange="updPart('${
             p.id
           }','cash',this.value)" class="grid-input text-green-700 dir-ltr"></td>
                 ${cells}
@@ -513,15 +525,19 @@
         renderCards();
       };
 
-      // --- RENDER CARDS (VESTING LOGIC FIXED) ---
       function renderCards() {
         const now = new Date();
-        const VEST = Number(state.config.vesting);
-        const globalCLIFF = Number(state.config.cliff);
+        const VEST = Number(state.config.vesting) || 48;
+        const globalCLIFF = Number(state.config.cliff) || 12;
 
         document.getElementById("cardsArea").innerHTML = state.partners
           .map((p) => {
+            // Safety Checks
+            if (!p.start) return "";
+
             const start = new Date(p.start);
+            if (isNaN(start)) return "";
+
             const monthsPassed = getMonthsPassed(p.start, now);
             const currentCliff = p.bypassedCliff ? 0 : globalCLIFF;
             const frozen = Number(p.frozen) || 0;
@@ -642,7 +658,7 @@
             frozen.toFixed(2),
             p.start,
             p.cash,
-            ...state.factors.map((f) => p.scores[f.id] || 0),
+            ...state.factors.map((f) => (p.scores && p.scores[f.id]) || 0),
             (frozen + dyn).toFixed(2),
             (frozen + vDyn).toFixed(2),
             nAmt.toFixed(2),
